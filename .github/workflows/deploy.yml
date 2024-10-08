@@ -11,22 +11,36 @@ jobs:
 
     steps:
 
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Log in to DigitalOcean Docker Registry
-        run: echo "${{ secrets.DIGITALOCEAN_API_TOKEN }}" | docker login registry.digitalocean.com -u do --password-stdin
+      # Step 3: SSH into DigitalOcean Droplet, clone repo, and deploy
+      - name: Deploy to DigitalOcean Droplet
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Clona el repositorio o actualiza el existente
+            if [ ! -d "/root/linktic-front" ]; then
+              git clone https://github.com/joseiguti/linktic-front.git /root/linktic-front
+            else
+              cd /root/linktic-front
+              git pull origin master
+            fi
 
-      - name: Build and Push with docker-compose
-        run: |
-          docker compose down -v
-          docker compose up -d --build
-          docker tag node:16-alpine registry.digitalocean.com/linktic-registry/linktic-front:latest
-          docker push registry.digitalocean.com/linktic-registry/linktic-front:latest
+            # Navega a la carpeta del repositorio
+            cd /root/linktic-front
 
-      - name: Deploy to DigitalOcean
-        run: |
-          echo "Deploy step here"
+            # Detener y eliminar contenedores existentes para evitar conflictos
+            docker-compose down --remove-orphans
+            docker rm -f linktic-front || true
+
+            # Levantar los nuevos contenedores
+            docker-compose up -d
