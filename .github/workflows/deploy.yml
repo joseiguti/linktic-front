@@ -38,6 +38,12 @@ jobs:
             # Navega a la carpeta del repositorio
             cd /root/linktic-front
 
+            # Crear archivo .env si no existe y sobrescribir las variables necesarias
+            echo "VITE_API_URL=http://64.23.245.14:8080/api" > .env
+            echo "VITE_IMAGES_URL=http://64.23.245.14:8080/images" >> .env
+            echo "VITE_BASIC_AUTH_USER=admin" >> .env
+            echo "VITE_BASIC_AUTH_PASSWD=secret" >> .env
+
             # Detener y eliminar contenedores existentes para evitar conflictos
             docker-compose down --remove-orphans
             docker rm -f linktic-front || true
