@@ -1,5 +1,6 @@
 services:
   linktic-front:
+    image: node:16-alpine
     container_name: linktic-front
     build: .
     ports:

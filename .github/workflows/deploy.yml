@@ -22,15 +22,9 @@ jobs:
 
       - name: Build and Push with docker-compose
         run: |
-          docker compose down -v  # Elimina los contenedores y volúmenes existentes
-          docker compose up -d --build  # Reconstruye y levanta los contenedores
-
-      - name: List Docker images
-        run: docker images  # Lista todas las imágenes para verificar que linktic-front está creada
-
-      - name: Tag and Push Docker image
-        run: |
-          docker tag linktic-front:latest registry.digitalocean.com/linktic-registry/linktic-front:latest
+          docker compose down -v
+          docker compose up -d --build
+          docker tag node:16-alpine registry.digitalocean.com/linktic-registry/linktic-front:latest
           docker push registry.digitalocean.com/linktic-registry/linktic-front:latest
 
       - name: Deploy to DigitalOcean
