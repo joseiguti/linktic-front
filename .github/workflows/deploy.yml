@@ -45,8 +45,8 @@ jobs:
             echo "VITE_BASIC_AUTH_PASSWD=secret" >> .env
 
             # Detener y eliminar contenedores existentes para evitar conflictos
-            docker-compose down --remove-orphans
+            docker-compose down -v --remove-orphans
             docker rm -f linktic-front || true
 
             # Levantar los nuevos contenedores
-            docker-compose up -d
+            docker-compose up -d --build
